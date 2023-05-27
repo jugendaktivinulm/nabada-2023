@@ -1,0 +1,10 @@
+*.scad
+	-lb ( )
+	-lb { }
+	-lb [ ]
+	-lcl //
+	-lcb /* */
+	-lk function
+	-lk include
+	-lk module
+	-lk use
