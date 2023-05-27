@@ -1,3 +1,5 @@
+include <components.scad>
+
 h = 1500;
 
 //Mittleres, gerades Modul
@@ -32,3 +34,13 @@ module wand(){
     translate([0,3000,0]) schiffwand4();
     translate([0,5000,0])mirror([0,1,0]) schiffwand5();
 }
+
+module wand2(){
+    translate([250,500,0])prism_([500,1000,h],spin=180,anchor=BOTTOM, covers=PLATE_RIGHT);
+    translate([250,2000,0])cube_([500,2000,h],anchor=BOTTOM,covers=PLATE_LEFT);
+    translate([250,3500,0])cube_([500,1000,0.75*h-beam_width],anchor=BOTTOM,covers=PLATE_LEFT);
+    translate([250,4500,0])mirror([1,0,0])prism_([500,1000,0.75*h],anchor=BOTTOM,covers=PLATE_RIGHT);
+    translate([250,3500,0.875*h-beam_width/2])prism_([1000,0.25*h+beam_width,500],orient=RIGHT,spin=90);
+}
+
+//wand2();

@@ -80,8 +80,8 @@ module plate_xz(size, anchor = CENTER, spin = 0, orient = UP) {
 	% cube([size[0], plate_thickness, size[1]], anchor = anchor, spin = spin, orient = orient);
 }
 
-module plate_yz(size, anchor = CENTER, spin = 0, orient = UP) {
-	echo("BOM", "Platte", size);
+module plate_yz(size, anchor = CENTER, spin = 0, orient = UP, supress_BOM = false) {
+	if(supress_BOM == false) echo("BOM", "Platte", size);
 	% cube([plate_thickness, size[0], size[1]], anchor = anchor, spin = spin, orient = orient);
 }
 
@@ -133,18 +133,31 @@ module cube_(size, covers = PLATE_NONE, anchor = CENTER, spin = 0, orient = UP) 
 module prism_(size, covers = PLATE_NONE, anchor = CENTER, spin = 0, orient = UP) {
 	attachable(anchor, spin, orient, size = size) {
 		union() {
-			move([-size[0]/2, 0, -size[2]/2]) beam_y(size[1], anchor = BOTTOM + LEFT );
-			move([-size[0]/2, 0,  size[2]/2]) beam_y(size[1], anchor = TOP    + LEFT );
+			move([-size[0]/2, beam_height/4, -size[2]/2]) beam_y(size[1] - beam_width - beam_height, anchor = BOTTOM + LEFT );
+			move([-size[0]/2, beam_height/4,  size[2]/2]) beam_y(size[1] - beam_width - beam_height, anchor = TOP    + LEFT );
 
-			move([0, -size[1]/2, -size[2]/2]) beam_x(size[0] - 2*beam_width, anchor = FRONT + BOTTOM);
-			move([0, -size[1]/2,  size[2]/2]) beam_x(size[0] - 2*beam_width, anchor = FRONT + TOP   );
+			move([0, -size[1]/2, -size[2]/2]) beam_x(size[0], anchor = FRONT + BOTTOM);
+			move([0, -size[1]/2,  size[2]/2]) beam_x(size[0], anchor = FRONT + TOP   );
 
 			move([-size[0]/2, -size[1]/2, 0]) beam_z(size[2] - 2*beam_height, anchor = FRONT + LEFT );
-			move([-size[0]/2,  size[1]/2, 0]) beam_z(size[2] - 2*beam_height, anchor = BACK  + LEFT );
+			move([-size[0]/2,  size[1]/2, 0]) beam_z(size[2], anchor = BACK  + LEFT );
 			move([ size[0]/2, -size[1]/2, 0]) beam_z(size[2] - 2*beam_height, anchor = FRONT + RIGHT);
+            
+            diag = sqrt((size[0] - beam_width)^2 + (size[1] - beam_width)^2);
+            alpha = atan((size[0] - beam_width)/(size[1] - beam_width));
+            
+            move([beam_width/2 , beam_width/2 , -size[2]/2]) beam_y(diag, anchor = BOTTOM + RIGHT,spin=alpha);
+            move([beam_width/2 , beam_width/2 ,  size[2]/2]) beam_y(diag, anchor = TOP    + RIGHT,spin=alpha);
 
 			if (has_plate_front (covers)) move([0, -size[1]/2, 0]) plate_xz([size[0], size[2]], anchor = FRONT );
 			if (has_plate_left  (covers)) move([-size[0]/2, 0, 0]) plate_yz([size[1], size[2]], anchor = LEFT  );
+            if (has_plate_right(covers) || has_plate_back(covers)) move([beam_width/2,beam_width/2,0]) plate_yz([diag,size[2]],anchor=RIGHT,spin=alpha);
+            if (has_plate_right(covers)) move([size[0]/2,-size[1]/2,0])plate_yz([beam_width,size[2]], anchor = RIGHT+FRONT);
+            
+            /*if (has_plate_top (covers)) move([0,0,size[2]/2]) difference(){
+                plate_xy([size[0],size[1]], anchor=TOP);
+                move([size[0]-beam_width/4,4*beam_width,0]) plate_xy([size[0],diag], spin=alpha, anchor=RIGHT+TOP);
+            }*/
 		}
 		children();
 	}
