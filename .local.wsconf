@@ -4,7 +4,19 @@
 	-lb [ ]
 	-lcl //
 	-lcb /* */
+	-lkp $
+	-lk assert
+	-lk children
+	-lk each
+	-lk echo
+	-lk false
+	-lk for
 	-lk function
+	-lk if
 	-lk include
+	-lk intersection_for
+	-lk let
 	-lk module
+	-lk render
+	-lk true
 	-lk use
