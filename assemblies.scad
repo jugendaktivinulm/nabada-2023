@@ -3,21 +3,21 @@ include <components.scad>
 wall_h = 1500;
 
 module wall1r(anchor = BOTTOM) {
-	prism_([500, 1000, wall_h], anchor = anchor, covers = FABRIC_RIGHT + PLATE_TOP);
+	prism_([500, 1000, wall_h], anchor = anchor, covers = FABRIC_RIGHT);
 }
 
 module wall2r(anchor = BOTTOM) {
-	cube_([500, 2000, wall_h], anchor = anchor, covers = FABRIC_RIGHT + PLATE_TOP, struts = [1, 1, 0]);
+	cube_([500, 2000, wall_h], anchor = anchor, covers = FABRIC_RIGHT, struts = [1, 1, 0]);
 }
 
 module wall3r(anchor = BOTTOM) {
 	cube_([500, 1000, 0.75*wall_h - beam_width], anchor = anchor, covers = FABRIC_RIGHT) {
-		position(TOP) prism_([1000, 0.25*wall_h + beam_width, 500], spin = 270, anchor = FRONT, orient = LEFT, covers = FABRIC_BOTTOM + PLATE_RIGHT);
+		position(TOP) prism_([1000, 0.25*wall_h + beam_width, 500], spin = 270, anchor = FRONT, orient = LEFT, covers = FABRIC_BOTTOM);
 	}
 }
 
 module wall4r(anchor = BOTTOM) {
-	mirror([0, 1, 0]) prism_([500, 1000, 0.75*wall_h], anchor = mirror([0, 1, 0], anchor), covers = FABRIC_RIGHT + PLATE_TOP);
+	mirror([0, 1, 0]) prism_([500, 1000, 0.75*wall_h], anchor = mirror([0, 1, 0], anchor), covers = FABRIC_RIGHT);
 }
 
 module wallr() {
