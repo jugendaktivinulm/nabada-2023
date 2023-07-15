@@ -5,6 +5,7 @@
 	-lcl //
 	-lcb /* */
 	-lkp $
+	-lsr \" \"
 	-lk assert
 	-lk children
 	-lk each

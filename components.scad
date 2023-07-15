@@ -1,6 +1,7 @@
 include <BOSL2/std.scad>
 
 exploded = is_undef($exploded) ? 1 : $exploded;
+label = is_undef($label) ? 0 : $label;
 
 // assumptions
 
@@ -17,17 +18,51 @@ plate_thickness = 10; // alternatives: 16, 19
 
 module beam_x(length, anchor = CENTER, spin = 0, orient = UP) {
 	echo("BOM", "Leiste", length);
-	recolor("sandybrown") cube([length, beam_width, beam_height], anchor = anchor, spin = spin, orient = orient);
+	recolor(label > 0 ? "red" : "sandybrown")
+		cube([length, beam_width, beam_height], anchor = anchor, spin = spin, orient = orient)
+			if (label > 1 && length >= 500)
+				position(TOP) rotate([$vpr[0], 0, $vpr[2] - spin])
+					recolor("white")
+						cylinder(d = 400, h = 1)
+							recolor("red")
+								attach(TOP)
+									text3d(str(round(length / 10) / 100, "m"), beam_width/2, 100, anchor = BOTTOM);
 }
 
 module beam_y(length, anchor = CENTER, spin = 0, orient = UP) {
 	echo("BOM", "Leiste", length);
-	recolor("sandybrown") cube([beam_width, length, beam_height], anchor = anchor, spin = spin, orient = orient);
+	recolor(label > 0? "green" : "sandybrown")
+		cube([beam_width, length, beam_height], anchor = anchor, spin = spin, orient = orient)
+			if (label > 1 && length >= 500)
+				position(TOP) rotate([$vpr[0], 0, $vpr[2] - spin])
+					recolor("white")
+						cylinder(d = 400, h = 1)
+							recolor("green")
+								text3d(str(round(length / 10) / 100, "m"), beam_width/2, 100, anchor = BOTTOM);
 }
 
 module beam_z(length, anchor = CENTER, spin = 0, orient = UP) {
 	echo("BOM", "Leiste", length);
-	recolor("sandybrown") cube([beam_width, beam_height, length], anchor = anchor, spin = spin, orient = orient);
+	recolor(label > 0 ? "blue" : "sandybrown")
+		cube([beam_width, beam_height, length], anchor = anchor, spin = spin, orient = orient)
+			if (label > 1 && length >= 500)
+				position(FRONT + LEFT) rotate([$vpr[0], 0, $vpr[2] - spin])
+					recolor("white")
+						cylinder(d = 400, h = 1)
+							recolor("blue")
+								text3d(str(round(length / 10) / 100, "m"), beam_width/2, 100, anchor = BOTTOM + BACK);
+}
+
+module beam_z_(length, anchor = CENTER, spin = 0, orient = UP) {
+	echo("BOM", "Leiste", length);
+	recolor(label > 0 ? "blue" : "sandybrown")
+		cube([beam_height, beam_width, length], anchor = anchor, spin = spin, orient = orient)
+			if (label > 1 && length >= 500)
+				position(FRONT + LEFT) rotate([$vpr[0], 0, $vpr[2] - spin])
+					recolor("white")
+						cylinder(d = 400, h = 1)
+							recolor("blue")
+								text3d(str(round(length / 10) / 100, "m"), beam_width/2, 100, anchor = BOTTOM + BACK);
 }
 
 module strut(a, b, anchor = FRONT +  LEFT, spin = 0, orient = UP) {
@@ -37,8 +72,16 @@ module strut(a, b, anchor = FRONT +  LEFT, spin = 0, orient = UP) {
 
 	attachable(anchor = anchor, spin = spin, orient = orient, size = [a, b, beam_height]) {
 		move([-a/2, -b/2, 0])
-			recolor("sandybrown") diff("remove") {
-				xmove(a) zrot(alpha) cube([beam_width, length, beam_height], anchor = FRONT + RIGHT, spin = 0, orient = UP);
+			recolor(label > 0 ? "goldenrod" : "sandybrown") diff("remove") {
+				xmove(a) zrot(alpha)
+					cube([beam_width, length, beam_height - 2], anchor = FRONT + RIGHT, spin = 0, orient = UP)
+						if (label > 1 && length >= 500)
+							position(TOP + LEFT) rotate([$vpr[0], 0, $vpr[2] - alpha - spin])
+								recolor("white")
+									cylinder(d = 400, h = 1)
+										recolor("goldenrod")
+											text3d(str(round(length / 10) / 100, "m"), beam_width/2, 100, anchor = BOTTOM);
+
 				tag("remove") cube([a + 1, beam_width + 1, beam_height + 1], anchor = BACK + LEFT);
 				tag("remove") cube([beam_width + 1, b + 1, beam_height + 1], anchor = FRONT + RIGHT);
 			}
@@ -221,9 +264,9 @@ module prism_(size, covers = COVER_NONE, anchor = CENTER, spin = 0, orient = UP)
 			move([0, -box[1]/2, -box[2]/2]) beam_x(size[0], anchor = FRONT + BOTTOM);
 			move([0, -box[1]/2,  box[2]/2]) beam_x(size[0], anchor = FRONT + TOP   );
 
-			move([-box[0]/2, -box[1]/2, 0]) beam_z(size[2] - 2*beam_height, anchor = FRONT + LEFT           );
-			move([-box[0]/2,  box[1]/2, 0]) beam_z(size[2]                , anchor = BACK  + LEFT           );
-			move([ box[0]/2, -box[1]/2, 0]) beam_z(size[2] - 2*beam_height, anchor = FRONT + LEFT, spin = 90);
+			move([-box[0]/2, -box[1]/2, 0]) beam_z_(size[2] - 2*beam_height, anchor = FRONT + LEFT );
+			move([-box[0]/2,  box[1]/2, 0]) beam_z (size[2]                , anchor = BACK  + LEFT );
+			move([ box[0]/2, -box[1]/2, 0]) beam_z_(size[2] - 2*beam_height, anchor = FRONT + RIGHT);
 
 			move([box[0]/2, box[1]/2, -box[2]/2]) strut(size[0] - beam_width, size[1] - beam_width, anchor = BOTTOM + BACK + RIGHT);
 			move([box[0]/2, box[1]/2,  box[2]/2]) strut(size[0] - beam_width, size[1] - beam_width, anchor = TOP    + BACK + RIGHT);

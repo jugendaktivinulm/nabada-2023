@@ -1,6 +1,6 @@
-include <components.scad>
+//$label = 2;
+//$exploded = 1.5;
+
 include <assemblies.scad>
 
-turret_base() {
-	position(TOP) turret_top();
-}
+turret_top();
